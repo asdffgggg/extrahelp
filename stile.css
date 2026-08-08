@@ -1,0 +1,4 @@
+#content {
+    width: max(10em, min(90%,50em));
+    margin:auto
+}
