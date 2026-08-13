@@ -1,0 +1,11 @@
+medical
+    vet
+    hospital/clinic
+    dentistry/specialization
+political
+    campaigning
+    canvasing
+    phonebanking
+enviornmental
+    specific enviornmental nonprofits
+    volunteering cleanup

@@ -8,8 +8,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="."))
 
 
-@app.get("/")
-async def root():
+def page(*args):
     conteant = Html(
         Head(
             Link(rel="stylesheet", href="static/stile.css"),
@@ -18,13 +17,54 @@ async def root():
         Body(
             Div(
                 H1("ExtraHelp"),
-                H3("Helping teens volunteer!"),
-                A("Get Started ➙", href = "https://www.nytimes.com/games/wordle/index.html?eafs_enabled=false"),
+                *args,
                 id="content",
             )
         ),
     )
     return HTMLResponse(to_xml(conteant))
+
+
+@app.get("/")
+async def root():
+    return page(
+        H3("Helping teens volunteer!"),
+        A(
+            "Get Started ➙",
+            href="/help",
+        ),
+    )
+
+
+interests = [
+    "politics",
+    "medicine",
+    "environment",
+    "miscellaneous",
+    "aid",
+    "technology",
+    "business",
+]
+
+
+@app.get("/help")
+async def input():
+    return page(
+        Form(
+            Label("date of birth", fr="dob"),
+            Input(name="dob", id="dob", type="date"),
+            *[
+                Div(
+                    Input(type="checkbox", name=interest, id=interest),
+                    Label(interest, fr=interest),
+                )
+                for interest in interests
+            ],
+        ),
+        Script(
+            src = '/static/location.js' 
+        ),
+    )
 
 
 if __name__ == "__main__":
