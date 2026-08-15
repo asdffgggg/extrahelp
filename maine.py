@@ -31,7 +31,7 @@ async def root():
         H3("Helping teens volunteer!"),
         A(
             "Get Started ➙",
-            href="/help",
+            href="/stage1",
         ),
     )
 
@@ -47,12 +47,13 @@ interests = [
 ]
 
 
-@app.get("/help")
-async def input():
+@app.get("/stage1")
+async def stage1():
     return page(
         Form(
             Label("date of birth", fr="dob"),
             Input(name="dob", id="dob", type="date"),
+            P("Interests:"),
             *[
                 Div(
                     Input(type="checkbox", name=interest, id=interest),
@@ -60,10 +61,35 @@ async def input():
                 )
                 for interest in interests
             ],
+            Input(id="lat", name="lat", style="display:none"),
+            Input(id="lon", name="lon", style="display:none"),
+            Button("next", type="submit"),
+            action="/stage2",
+            method="POST",
         ),
-        Script(
-            src = '/static/location.js' 
-        ),
+        Script(src="/static/location.js"),
+    )
+
+goals = ["Better teamwork"]
+
+@app.post("/stage2")
+async def stage2(request: Request):
+    data = dict(await request.form())
+    print(data)
+    return page(
+        Form(
+            P("Goals:"),
+            *[
+                Div(
+                    Input(type="checkbox", name=goal, id=goal),
+                    Label(goal, fr=goal),
+                )
+                for goal in goals
+            ],
+            Button("next", type="submit"),
+            action="/stage2",
+            method="POST",
+        )
     )
 
 
