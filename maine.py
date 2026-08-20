@@ -52,25 +52,36 @@ async def stage1():
     return page(
         Form(
             Label("date of birth", fr="dob"),
-            Input(name="dob", id="dob", type="date"),
+            Input(name="dob", id="dob", type="date", cls="input"),
             P("Interests:"),
             *[
                 Div(
-                    Input(type="checkbox", name=interest, id=interest),
+                    Input(type="checkbox", name=interest, id=interest, cls="input"),
                     Label(interest, fr=interest),
                 )
                 for interest in interests
             ],
-            Input(id="lat", name="lat", style="display:none"),
-            Input(id="lon", name="lon", style="display:none"),
+            Input(id="lat", name="lat", style="display:none", cls="input"),
+            Input(id="lon", name="lon", style="display:none", cls="input"),
             Button("next", type="submit"),
+            id="form",
             action="/stage2",
             method="POST",
         ),
         Script(src="/static/location.js"),
+        Script(src="/static/submit.js"),
     )
 
-goals = ["Better teamwork"]
+
+goals = [
+    "Better teamwork",
+    "Improved Knowledge of subject",
+    "Volunteering Hours",
+    "Field Experience",
+    "Networking",
+    "I'm just a good person",
+]
+
 
 @app.post("/stage2")
 async def stage2(request: Request):
@@ -81,7 +92,7 @@ async def stage2(request: Request):
             P("Goals:"),
             *[
                 Div(
-                    Input(type="checkbox", name=goal, id=goal),
+                    Input(type="checkbox", name=goal, id=goal, cls = "input"),
                     Label(goal, fr=goal),
                 )
                 for goal in goals
@@ -89,7 +100,9 @@ async def stage2(request: Request):
             Button("next", type="submit"),
             action="/stage2",
             method="POST",
-        )
+            id="form",
+        ),
+        Script(src="/static/submit.js"),
     )
 
 
@@ -100,3 +113,7 @@ if __name__ == "__main__":
         port=8000,
         reload=True,
     )
+
+# id="form",
+# Script(src="/static/submit.js"),
+#  cls = "input"
