@@ -92,18 +92,40 @@ async def stage2(request: Request):
             P("Goals:"),
             *[
                 Div(
-                    Input(type="checkbox", name=goal, id=goal, cls = "input"),
+                    Input(type="checkbox", name=goal, id=goal, cls="input"),
                     Label(goal, fr=goal),
                 )
                 for goal in goals
             ],
+            *[
+                Input(value = value,id=key, name=key, style="display:none", cls="input")
+                for key, value in data.items()
+            ],
             Button("next", type="submit"),
-            action="/stage2",
+            action="/prompt",
             method="POST",
             id="form",
         ),
         Script(src="/static/submit.js"),
     )
+
+
+@app.post("/prompt")
+async def prompt(request: Request):
+    data = dict(await request.form())
+    prompt = "user looking for places volunteer\n"
+    prompt +=f"users date of birth is {data["dob"]}\n"
+    prompt +=f"users location is {data["lat"]},{data["lon"]} \n"
+    prompt +="user is interested in:"
+    for interest in interests:
+        if interest in data:
+            prompt += f"{interest},"
+    prompt +="users goals for this oppurtunity:"
+    for goal in goals:
+        if goal in data:
+            prompt += f"{goal},"
+    
+    return page(prompt)
 
 
 if __name__ == "__main__":
