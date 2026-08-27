@@ -15,11 +15,11 @@ def page(*args):
             Title("ExtraHelp"),
         ),
         Body(
+            H1("ExtraHelp", cls="logo"),
             Div(
-                H1("ExtraHelp"),
                 *args,
                 id="content",
-            )
+            ),
         ),
     )
     return HTMLResponse(to_xml(conteant))
@@ -31,6 +31,7 @@ async def root():
         H3("Helping teens volunteer!"),
         A(
             "Get Started ➙",
+            cls="started",
             href="/stage1",
         ),
     )
@@ -98,7 +99,7 @@ async def stage2(request: Request):
                 for goal in goals
             ],
             *[
-                Input(value = value,id=key, name=key, style="display:none", cls="input")
+                Input(value=value, id=key, name=key, style="display:none", cls="input")
                 for key, value in data.items()
             ],
             Button("next", type="submit"),
@@ -114,17 +115,17 @@ async def stage2(request: Request):
 async def prompt(request: Request):
     data = dict(await request.form())
     prompt = "user looking for places volunteer\n"
-    prompt +=f"users date of birth is {data["dob"]}\n"
-    prompt +=f"users location is {data["lat"]},{data["lon"]} \n"
-    prompt +="user is interested in:"
+    prompt += f"users date of birth is {data['dob']}\n"
+    prompt += f"users location is {data['lat']},{data['lon']} \n"
+    prompt += "user is interested in:"
     for interest in interests:
         if interest in data:
             prompt += f"{interest},"
-    prompt +="users goals for this oppurtunity:"
+    prompt += "users goals for this oppurtunity:"
     for goal in goals:
         if goal in data:
             prompt += f"{goal},"
-    
+
     return page(prompt)
 
 
