@@ -1,0 +1,25 @@
+{
+    "success": [
+        {
+            "name": "California Environmental Youth Advisory Council (CalEPA)",
+            "address": "1001 I Street, Sacramento, CA 95814",
+            "phone number": "(916) 323-2514",
+            "website": "https://calepa.ca.gov/youthcouncil/",
+            "description": "This is an especially strong match because applicants ages 14–20 can help shape environmental policy, work with California environmental decision-makers, and build leadership and networking skills. Applications for the inaugural cohort are open through September 21, 2026."
+        },
+        {
+            "name": "American River Parkway Foundation",
+            "address": "5700 Arden Way, Carmichael, CA 95608",
+            "phone number": "(916) 486-2773",
+            "website": "https://arpf.org/volunteer/",
+            "description": "ARPF offers youth-friendly environmental volunteer projects such as river cleanups, invasive-plant removal, habitat restoration, and trail maintenance. These activities can provide community-service hours while developing teamwork and connections with other volunteers."
+        },
+        {
+            "name": "Sacramento County Voter Registration & Elections – Vote Center Program",
+            "address": "7000 65th Street, Suite A, Sacramento, CA 95823",
+            "phone number": "(916) 875-6100",
+            "website": "https://elections.saccounty.gov/us/en/work-the-election.html",
+            "description": "Because the user is 16, they are eligible to work at a Sacramento County Vote Center and receive community-service hours. This is a strong politics-related opportunity for learning about elections, meeting people involved in civic work, and gaining practical experience."
+        }
+    ]
+}

@@ -33,9 +33,11 @@ body {
 }
 
 .started {
-    margin-top: 0.2em;
+    margin-top: 0.2em; 
+    margin-bottom: 1.3em;
     display: inline-block;
     font-size: 3em;
+
 }
 
 input {
@@ -43,4 +45,16 @@ input {
     color: rgb(26, 37, 73);
     border-radius: 0.5em;
     padding: 0.5em;
+}
+
+button{
+    background-color:#ffffff80;
+    color: rgb(26, 37, 73);
+    border-radius: 0.5em;
+    padding: 0.5em;
+    
+}
+
+.glow{
+text-shadow:  0 0 0.5em white;
 }
