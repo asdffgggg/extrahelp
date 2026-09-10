@@ -33,7 +33,7 @@ body {
 }
 
 .started {
-    margin-top: 0.2em; 
+    margin-top: 0.2em;
     margin-bottom: 1.3em;
     display: inline-block;
     font-size: 3em;
@@ -47,14 +47,23 @@ input {
     padding: 0.5em;
 }
 
-button{
-    background-color:#ffffff80;
+button {
+    background-color: #ffffff80;
     color: rgb(26, 37, 73);
     border-radius: 0.5em;
     padding: 0.5em;
-    
+
 }
 
-.glow{
-text-shadow:  0 0 0.5em white;
+.glow {
+    text-shadow: 0 0 0.5em white;
+}
+
+a {
+    transition: transform 0.3s ease-in-out;
+}
+
+a:hover {
+    /* transform: rotate(360000000000000000000000000000000000000000deg) */
+    transform: scale(1.1) rotate(-6deg)
 }
