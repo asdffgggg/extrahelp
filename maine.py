@@ -9,7 +9,7 @@ from fasthtml.common import *
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="."))
 
-
+# wraps page conteant in headers and stuff
 def page(*args):
     conteant = Html(
         Head(
@@ -57,8 +57,10 @@ interests = [
 async def stage1():
     return page(
         Form(
+            # date of birth
             Label("date of birth", fr="dob"),
             Input(name="dob", id="dob", type="date", cls="input"),
+            #interests
             P("Interests:"),
             *[
                 Div(
@@ -67,6 +69,7 @@ async def stage1():
                 )
                 for interest in interests
             ],
+            # stores user location
             Input(id="lat", name="lat", style="display:none", cls="input"),
             Input(id="lon", name="lon", style="display:none", cls="input"),
             Br(),
@@ -76,7 +79,6 @@ async def stage1():
             method="POST",
         ),
         Script(src="/static/location.js"),
-        Script(src="/static/submit.js"),
     )
 
 
@@ -92,6 +94,7 @@ goals = [
 
 @app.post("/stage2")
 async def stage2(request: Request):
+    # collect data from previous form
     data = dict(await request.form())
     print(data)
     return page(
@@ -104,21 +107,21 @@ async def stage2(request: Request):
                 )
                 for goal in goals
             ],
+            #data from previous form invisible ↓
             *[
                 Input(value=value, id=key, name=key, style="display:none", cls="input")
                 for key, value in data.items()
             ],
             Br(),
             Button("next", type="submit"),
-            action="/prompt",
+            action="/results",
             method="POST",
             id="form",
         ),
-        Script(src="/static/submit.js"),
     )
 
-
-@app.post("/prompt")
+#creating prompt and shows results on a page (/results)
+@app.post("/results")
 async def prompt(request: Request):
     data = dict(await request.form())
     prompt = "user looking for places volunteer\n"
@@ -134,10 +137,12 @@ async def prompt(request: Request):
             prompt += f"{goal},"
     prompt += "\n give response in json format. on success, give an object with a single key 'success'. the value of the success key should be an array of objects, each with keys (name, address, phone number, website, description).the description should be a sentance or two on why the opportunity fits for the user. on faliure, give a single key: error, with a value of why it went wrong. make sure the error message is user friendlyt and can be understood by the user with no coding experience, also feel free to error if there are no available oppurtunities because of the users age, or location. address the user in a second person manner and refer to yourself as 'we'."
 
+    #todo! REPLACE WITH OPEN AI STUFF!!!!!!!!!!!
     error = """"{"error":"We couldn't find a verified volunteer opportunity that is appropriate for you at age 6 and specifically matches technology or business. The City of Sacramento's youth volunteer programs generally start at age 12, while technology-focused opportunities such as Computers 4 Kids do not publish a minimum age that would confirm eligibility for a 6-year-old. We recommend looking for family-friendly community service activities where you can participate with a parent or guardian. "}"""
 
     success = """{"success":[{"name":"Sacramento Food Bank & Family Services","address":"1951 Bell Avenue, Sacramento, CA 95838","phone number":"(916) 456-1980","website":"https://www.sacramentofoodbank.org/volunteer","description":"This is a strong fit for an 11-year-old interested in helping people through food assistance. Volunteers ages 10–15 can participate when accompanied by an adult, and the organization provides structured volunteer shifts that can help build documented service hours."},{"name":"River City Food Bank","address":"1800 28th Street, Sacramento, CA 95816","phone number":"(916) 446-2627","website":"https://rivercityfoodbank.org/volunteer-your-time/","description":"River City Food Bank directly supports people experiencing food insecurity, making it a good aid-focused opportunity. Volunteers ages 10–14 may participate with adult supervision, so an 11-year-old can volunteer with a parent or other supervising adult."}]}"""
 
+    #converts response from string to json(jason)
     jason = json.loads(success)
 
     if 'success' in jason:
@@ -154,11 +159,13 @@ async def prompt(request: Request):
                 for item in jason["success"]
             ]
         )
+    if 'error' in jason:
+        pass
 
     print(prompt)
     return page(prompt)
 
-
+# creates and runs server
 if __name__ == "__main__":
     uvicorn.run(
         "maine:app",
@@ -167,6 +174,4 @@ if __name__ == "__main__":
         reload=True,
     )
 
-# id="form",
-# Script(src="/static/submit.js"),
-#  cls = "input"
+

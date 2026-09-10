@@ -1,3 +1,4 @@
+// requests user location
 navigator.geolocation.getCurrentPosition(
     (pos) => {
         document.getElementById("lat").value = pos.coords.latitude
