@@ -50,6 +50,7 @@ interests = [
     "aid",
     "technology",
     "business",
+    "other",
 ]
 
 
@@ -69,6 +70,7 @@ async def stage1():
                 )
                 for interest in interests
             ],
+            Input(type="text", id = "othertext", style="display:none" ,cls = "input"),
             # stores user location
             Input(id="lat", name="lat", style="display:none", cls="input"),
             Input(id="lon", name="lon", style="display:none", cls="input"),
@@ -79,6 +81,7 @@ async def stage1():
             method="POST",
         ),
         Script(src="/static/location.js"),
+        Script(src="/static/other.js"),
     )
 
 
@@ -129,8 +132,13 @@ async def prompt(request: Request):
     prompt += f"users location is {data['lat']},{data['lon']} \n"
     prompt += "user is interested in:"
     for interest in interests:
-        if interest in data:
-            prompt += f"{interest},"
+        if interest == "other":
+            if interest in data:
+                prompt += f"{data['othertext']},"
+        else:  
+            if interest in data:
+
+                prompt += f"{interest},"
     prompt += "\nusers goals for this oppurtunity:"
     for goal in goals:
         if goal in data:
@@ -143,24 +151,24 @@ async def prompt(request: Request):
     success = """{"success":[{"name":"Sacramento Food Bank & Family Services","address":"1951 Bell Avenue, Sacramento, CA 95838","phone number":"(916) 456-1980","website":"https://www.sacramentofoodbank.org/volunteer","description":"This is a strong fit for an 11-year-old interested in helping people through food assistance. Volunteers ages 10–15 can participate when accompanied by an adult, and the organization provides structured volunteer shifts that can help build documented service hours."},{"name":"River City Food Bank","address":"1800 28th Street, Sacramento, CA 95816","phone number":"(916) 446-2627","website":"https://rivercityfoodbank.org/volunteer-your-time/","description":"River City Food Bank directly supports people experiencing food insecurity, making it a good aid-focused opportunity. Volunteers ages 10–14 may participate with adult supervision, so an 11-year-old can volunteer with a parent or other supervising adult."}]}"""
 
     #converts response from string to json(jason)
-    jason = json.loads(success)
+    # jason = json.loads(success)
 
-    if 'success' in jason:
-        return page(
-            *[
-                Div(
-                    H1(item['name']),
-                    P(item['phone number']),
-                    P(item['address']),
-                    A(item['website'], href = item['website'], cls = 'glow'),
-                    P(item['description']),
+    # if 'success' in jason:
+    #     return page(
+    #         *[
+    #             Div(
+    #                 H1(item['name']),
+    #                 P(item['phone number']),
+    #                 P(item['address']),
+    #                 A(item['website'], href = item['website'], cls = 'glow'),
+    #                 P(item['description']),
                     
-                )
-                for item in jason["success"]
-            ]
-        )
-    if 'error' in jason:
-        pass
+    #             )
+    #             for item in jason["success"]
+    #         ]
+    #     )
+    # if 'error' in jason:
+    #     pass
 
     print(prompt)
     return page(prompt)
