@@ -5,6 +5,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fasthtml.common import *
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="."))
@@ -82,6 +85,7 @@ async def stage1():
         ),
         Script(src="/static/location.js"),
         Script(src="/static/other.js"),
+        
     )
 
 
@@ -92,6 +96,7 @@ goals = [
     "Field Experience",
     "Networking",
     "I'm just a good person",
+    "other goals"
 ]
 
 
@@ -110,6 +115,7 @@ async def stage2(request: Request):
                 )
                 for goal in goals
             ],
+             Input(type="text", id = "othergoalstext", style="display:none" ,cls = "input"),
             #data from previous form invisible ↓
             *[
                 Input(value=value, id=key, name=key, style="display:none", cls="input")
@@ -121,6 +127,7 @@ async def stage2(request: Request):
             method="POST",
             id="form",
         ),
+        Script(src="/static/othergoals.js"),
     )
 
 #creating prompt and shows results on a page (/results)
@@ -141,8 +148,12 @@ async def prompt(request: Request):
                 prompt += f"{interest},"
     prompt += "\nusers goals for this oppurtunity:"
     for goal in goals:
-        if goal in data:
-            prompt += f"{goal},"
+            if goal == "other goals":
+                if goal in data:
+                    prompt += f"{data['othergoalstext']},"
+            else:  
+                if goal in data:
+                    prompt += f"{goal},"
     prompt += "\n give response in json format. on success, give an object with a single key 'success'. the value of the success key should be an array of objects, each with keys (name, address, phone number, website, description).the description should be a sentance or two on why the opportunity fits for the user. on faliure, give a single key: error, with a value of why it went wrong. make sure the error message is user friendlyt and can be understood by the user with no coding experience, also feel free to error if there are no available oppurtunities because of the users age, or location. address the user in a second person manner and refer to yourself as 'we'."
 
     #todo! REPLACE WITH OPEN AI STUFF!!!!!!!!!!!
@@ -169,15 +180,42 @@ async def prompt(request: Request):
     #     )
     # if 'error' in jason:
     #     pass
+    load_dotenv()
+    
+    messages = [
+        {
+            "role": "user",
+            "content" : 
+            """you are an AI model that helps people find volunteering hours. the next message is your given prompt that the user made to find volunteering hours. please answer sufficiently. """
+        },
 
-    print(prompt)
-    return page(prompt)
+        {
+            "role": "user",
+            "content" : prompt
+
+
+
+        }
+    ]
+    
+    client = OpenAI(
+        # This is the default and can be omitted
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+    
+    response = client.chat.completions.create(
+        model="gpt-4",  # Or your desired model, e.g., "gpt-4"
+        messages= messages
+    )
+    print(response)
+
+    return page(response)
 
 # creates and runs server
 if __name__ == "__main__":
     uvicorn.run(
         "maine:app",
-        host="127.0.0.1",
+        host="127.0.0.1", 
         port=8000,
         reload=True,
     )
