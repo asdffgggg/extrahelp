@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="."))
 
+
 # wraps page conteant in headers and stuff
 def page(*args):
     conteant = Html(
@@ -64,7 +65,7 @@ async def stage1():
             # date of birth
             Label("date of birth", fr="dob"),
             Input(name="dob", id="dob", type="date", cls="input"),
-            #interests
+            # interests
             P("Interests:"),
             *[
                 Div(
@@ -73,7 +74,7 @@ async def stage1():
                 )
                 for interest in interests
             ],
-            Input(type="text", id = "othertext", style="display:none" ,cls = "input"),
+            Input(type="text", id="othertext", style="display:none", cls="input"),
             # stores user location
             Input(id="lat", name="lat", style="display:none", cls="input"),
             Input(id="lon", name="lon", style="display:none", cls="input"),
@@ -85,7 +86,6 @@ async def stage1():
         ),
         Script(src="/static/location.js"),
         Script(src="/static/other.js"),
-        
     )
 
 
@@ -96,7 +96,7 @@ goals = [
     "Field Experience",
     "Networking",
     "I'm just a good person",
-    "other goals"
+    "other goals",
 ]
 
 
@@ -115,8 +115,8 @@ async def stage2(request: Request):
                 )
                 for goal in goals
             ],
-             Input(type="text", id = "othergoalstext", style="display:none" ,cls = "input"),
-            #data from previous form invisible ↓
+            Input(type="text", id="othergoalstext", style="display:none", cls="input"),
+            # data from previous form invisible ↓
             *[
                 Input(value=value, id=key, name=key, style="display:none", cls="input")
                 for key, value in data.items()
@@ -130,7 +130,8 @@ async def stage2(request: Request):
         Script(src="/static/othergoals.js"),
     )
 
-#creating prompt and shows results on a page (/results)
+
+# creating prompt and shows results on a page (/results)
 @app.post("/results")
 async def prompt(request: Request):
     data = dict(await request.form())
@@ -142,82 +143,75 @@ async def prompt(request: Request):
         if interest == "other":
             if interest in data:
                 prompt += f"{data['othertext']},"
-        else:  
+        else:
             if interest in data:
-
                 prompt += f"{interest},"
     prompt += "\nusers goals for this oppurtunity:"
     for goal in goals:
-            if goal == "other goals":
-                if goal in data:
-                    prompt += f"{data['othergoalstext']},"
-            else:  
-                if goal in data:
-                    prompt += f"{goal},"
+        if goal == "other goals":
+            if goal in data:
+                prompt += f"{data['othergoalstext']},"
+        else:
+            if goal in data:
+                prompt += f"{goal},"
     prompt += "\n give response in json format. on success, give an object with a single key 'success'. the value of the success key should be an array of objects, each with keys (name, address, phone number, website, description).the description should be a sentance or two on why the opportunity fits for the user. on faliure, give a single key: error, with a value of why it went wrong. make sure the error message is user friendlyt and can be understood by the user with no coding experience, also feel free to error if there are no available oppurtunities because of the users age, or location. address the user in a second person manner and refer to yourself as 'we'."
 
-    #todo! REPLACE WITH OPEN AI STUFF!!!!!!!!!!!
+    # todo! REPLACE WITH OPEN AI STUFF!!!!!!!!!!!
     error = """"{"error":"We couldn't find a verified volunteer opportunity that is appropriate for you at age 6 and specifically matches technology or business. The City of Sacramento's youth volunteer programs generally start at age 12, while technology-focused opportunities such as Computers 4 Kids do not publish a minimum age that would confirm eligibility for a 6-year-old. We recommend looking for family-friendly community service activities where you can participate with a parent or guardian. "}"""
 
     success = """{"success":[{"name":"Sacramento Food Bank & Family Services","address":"1951 Bell Avenue, Sacramento, CA 95838","phone number":"(916) 456-1980","website":"https://www.sacramentofoodbank.org/volunteer","description":"This is a strong fit for an 11-year-old interested in helping people through food assistance. Volunteers ages 10–15 can participate when accompanied by an adult, and the organization provides structured volunteer shifts that can help build documented service hours."},{"name":"River City Food Bank","address":"1800 28th Street, Sacramento, CA 95816","phone number":"(916) 446-2627","website":"https://rivercityfoodbank.org/volunteer-your-time/","description":"River City Food Bank directly supports people experiencing food insecurity, making it a good aid-focused opportunity. Volunteers ages 10–14 may participate with adult supervision, so an 11-year-old can volunteer with a parent or other supervising adult."}]}"""
 
-    #converts response from string to json(jason)
-    # jason = json.loads(success)
-
-    # if 'success' in jason:
-    #     return page(
-    #         *[
-    #             Div(
-    #                 H1(item['name']),
-    #                 P(item['phone number']),
-    #                 P(item['address']),
-    #                 A(item['website'], href = item['website'], cls = 'glow'),
-    #                 P(item['description']),
-                    
-    #             )
-    #             for item in jason["success"]
-    #         ]
-    #     )
-    # if 'error' in jason:
-    #     pass
-    load_dotenv()
+    # converts response from string to json(jason)
     
+
+    
+    load_dotenv()
+
     messages = [
         {
             "role": "user",
-            "content" : 
-            """you are an AI model that helps people find volunteering hours. the next message is your given prompt that the user made to find volunteering hours. please answer sufficiently. """
+            "content": """you are an AI model that helps people find volunteering hours. the next message is your given prompt that the user made to find volunteering hours. please answer sufficiently. """,
         },
-
-        {
-            "role": "user",
-            "content" : prompt
-
-
-
-        }
+        {"role": "user", "content": prompt},
     ]
-    
+
     client = OpenAI(
         # This is the default and can be omitted
-        api_key=os.getenv("OPENAI_API_KEY"),
+        api_key=os.getenv("OPEN_API___KEY"),
     )
-    
+
     response = client.chat.completions.create(
         model="gpt-4",  # Or your desired model, e.g., "gpt-4"
-        messages= messages
+        messages=messages,
     )
-    print(response)
+    print(response.choices)
+    contento = response.choices[0].message.content
+    jason = json.loads(contento)
+    if 'success' in jason:
+        return page(
+            *[
+                Div(
+                    H1(item['name']),
+                    P(item['phone number']),
+                    P(item['address']),
+                    A(item['website'], href = item['website'], cls = 'glow'),
+                    P(item['description']),
 
-    return page(response)
+                )
+                for item in jason["success"]
+            ]
+        )
+    if 'error' in jason:
+        pass
+    
+    
+
 
 # creates and runs server
 if __name__ == "__main__":
     uvicorn.run(
         "maine:app",
-        host="127.0.0.1", 
+        host="127.0.0.1",
         port=8000,
         reload=True,
     )
-
-
